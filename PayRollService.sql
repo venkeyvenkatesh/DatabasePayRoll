@@ -1,4 +1,7 @@
---UC2 Create Database
+--UC1 Create a database
+create database myPayrollDB
+
+--UC2 Create a table
 create table Employee_payroll(
 
 id int NOT NULL identity(1,1) PRIMARY KEY,
