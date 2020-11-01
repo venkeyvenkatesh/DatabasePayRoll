@@ -1,7 +1,7 @@
---UC1 Create a database
+--UC1 Create Database
 create database myPayrollDB
 
---UC2 Create a table
+--UC2 creaete a table
 create table Employee_payroll(
 
 id int NOT NULL identity(1,1) PRIMARY KEY,
@@ -45,10 +45,91 @@ select gender,min(salary) as MinSalary from Employee_payroll group by(gender);
 
 select gender,count(*) as NumberOfPeople from Employee_payroll group by gender;
 
-alter table Employee_payroll add 
-phoneNumber varchar(255),
-empAddress varchar(255) default 'MUMBAI' ,
-department varchar(255) 
-;
 
-select empAddress from Employee_payroll;
+
+--exec sp_help Table_name to view the table structure
+
+
+
+select * from Employee_payroll;
+
+--UC8 adding phonenumber empaddress and department columns to existing table
+
+alter table Employee_payroll add
+phoneNumber varchar(20) ;
+alter table Employee_payroll add
+empAdress varchar(120) not null default 'MUMBAI';
+
+alter table Employee_payroll add
+department varchar(255) not null default 'communication';
+
+
+EXEC sp_RENAME 'Employee_payroll.salary', 'basicPay', 'COLUMN';
+
+--UC9 Adding deductions,taxable pay ,tax and net_pay to existing table
+alter table Employee_payroll add deductions decimal(10,2) not null default 0.0;
+
+alter table Employee_payroll add taxable_pay decimal(10,2) not null default 0.0;
+
+alter table Employee_payroll add tax decimal(10,2) not null default 0.0;
+
+alter table Employee_payroll add net_pay decimal(10,2) not null default 0.0;
+
+select * from Employee_payroll;
+
+--UC 10 adding same perso working in different department to cause redundancy
+insert Employee_payroll values('Rashmi',70000,'2018-05-11','F',NULL,'MUMBAI','software',0,0,0,0);
+
+
+select * from Employee_payroll;
+
+             
+--UC 11 create a new table employee department and department table
+
+create table DEPARTMENT(DeptId int primary key,DeptName varchar(100));
+
+
+select * from DEPARTMENT;
+insert into DEPARTMENT VALUES(100,'communication');
+INSERT INTO DEPARTMENT VALUES(101,'software');
+INSERT INTO DEPARTMENT VALUES(102,'testing');
+
+create table Employee_department (id int, DeptId int ,Primary key(id,DeptId));
+
+insert into Employee_department values(1,100);
+insert into Employee_department values(2,100);
+insert into Employee_department values(3,100);
+insert into Employee_department values(4,100);
+insert into Employee_department values(4,101);
+
+select * from Employee_department;
+
+sp_help Employee_payroll
+
+select * from Employee_payroll;
+
+delete from Employee_payroll where id=6;
+alter table Employee_payroll drop column department;
+
+select a.name,c.DeptName from 
+Employee_payroll a inner join Employee_department b on a.id=b.id 
+ inner join DEPARTMENT c on b.DeptId=c.DeptId ;
+
+select * from Employee_payroll;
+
+--UC12 Ensure all the operations working fine
+
+select a.name,a.basicPay,a.start_Date,a.gender,
+a.phoneNumber,a.empAdress,a.deductions,
+a.taxable_pay,a.tax,a.net_pay,c.DeptName from 
+Employee_payroll a inner join Employee_department b on a.id=b.id 
+ inner join DEPARTMENT c on b.DeptId=c.DeptId where c.DeptName='communication';
+
+
+ select a.name,a.basicPay,a.start_Date,a.gender,
+a.phoneNumber,a.empAdress,a.deductions,
+a.taxable_pay,a.tax,a.net_pay,c.DeptName from 
+Employee_payroll a inner join Employee_department b on a.id=b.id 
+ inner join DEPARTMENT c on b.DeptId=c.DeptId where c.DeptName='software';
+
+
