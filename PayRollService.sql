@@ -86,6 +86,8 @@ select * from Employee_payroll;
              
 --UC 11 create a new table employee department and department table
 
+
+--creating Department table to store the dept id and dept name;
 create table DEPARTMENT(DeptId int primary key,DeptName varchar(100));
 
 
@@ -94,6 +96,8 @@ insert into DEPARTMENT VALUES(100,'communication');
 INSERT INTO DEPARTMENT VALUES(101,'software');
 INSERT INTO DEPARTMENT VALUES(102,'testing');
 
+
+--creating employee department table to store employee id,dept id
 create table Employee_department (id int, DeptId int ,Primary key(id,DeptId));
 
 insert into Employee_department values(1,100);
@@ -104,7 +108,7 @@ insert into Employee_department values(4,101);
 
 select * from Employee_department;
 
-sp_help Employee_payroll
+--sp_help Employee_payroll
 
 select * from Employee_payroll;
 
@@ -119,17 +123,33 @@ select * from Employee_payroll;
 
 --UC12 Ensure all the operations working fine
 
-select a.name,a.basicPay,a.start_Date,a.gender,
-a.phoneNumber,a.empAdress,a.deductions,
-a.taxable_pay,a.tax,a.net_pay,c.DeptName from 
+select a.name,a.start_Date,a.gender,
+a.empAddress,c.DeptName from 
 Employee_payroll a inner join Employee_department b on a.id=b.id 
  inner join DEPARTMENT c on b.DeptId=c.DeptId where c.DeptName='communication';
 
 
- select a.name,a.basicPay,a.start_Date,a.gender,
-a.phoneNumber,a.empAdress,a.deductions,
-a.taxable_pay,a.tax,a.net_pay,c.DeptName from 
+ select a.name,a.start_Date,a.gender,
+a.empAddress,c.DeptName from 
 Employee_payroll a inner join Employee_department b on a.id=b.id 
  inner join DEPARTMENT c on b.DeptId=c.DeptId where c.DeptName='software';
+
+
+ --creating payments table to store the details about payments
+ create table payments (id int,basicPay DECIMAL(10,2) NOT NULL,deductions decimal(10,2) not null default 0.0,taxable_pay decimal(10,2) not null default 0.0,
+tax decimal(10,2) not null default 0.0, net_pay decimal(10,2) not null default 0.0);
+
+select * from payments;
+
+alter table Employee_payroll drop column basicPay,empAdress,deductions,taxable_pay,tax,net_pay;
+
+select a.gender,sum(b.net_pay)SumOfSalaries from Employee_payroll a inner join payments b on a.id=b.id group by a.gender;
+
+select a.gender,avg(b.net_pay)AvgOfSalaries from Employee_payroll a inner join payments b on a.id=b.id group by a.gender;
+
+select a.gender,max(b.net_pay)MaxOfSalaries from Employee_payroll a inner join payments b on a.id=b.id group by a.gender;
+
+select a.gender,min(b.net_pay)MinOfSalaries from Employee_payroll a inner join payments b on a.id=b.id group by a.gender;
+
 
 
